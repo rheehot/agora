@@ -25,3 +25,12 @@ module agora.utils.Workarounds;
  */
 static if (__VERSION__ >= 2087)
     extern(C) __gshared string[] rt_options = [ "gcopt=parallel:0" ];
+
+// Workaround https://issues.dlang.org/show_bug.cgi?id=19937
+private void workaround19937 ()
+{
+    ulong x = 42;
+    assert(x > 0);
+    // Thise one triggers with LDC 1.20.0
+    assert(0 < 42);
+}
