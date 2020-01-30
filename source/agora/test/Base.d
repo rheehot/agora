@@ -632,17 +632,11 @@ public APIManager makeTestNetwork (APIManager : TestAPIManager = TestAPIManager)
                 .filter!(conf => conf != self)
                 .map!(conf => conf.key_pair.address.toString());
 
-        auto quorum_keys =
-            node_confs
-                .filter!(conf => conf.is_validator)
-                .map!(conf => conf.key_pair.address).array.assumeUnique;
-
         Config conf =
         {
             banman : ban_conf,
             node : self,
             network : configure_network ? assumeUnique(other_nodes.array) : null,
-            quorum : { nodes : quorum_keys }
         };
 
         return conf;
@@ -657,14 +651,11 @@ public APIManager makeTestNetwork (APIManager : TestAPIManager = TestAPIManager)
                 .filter!(conf => conf != self)
                 .map!(conf => conf.key_pair.address.toString());
 
-        immutable quorum_keys = [self.key_pair.address, node_confs[prev_idx].key_pair.address];
-
         Config conf =
         {
             banman : ban_conf,
             node : self,
             network : configure_network ? assumeUnique(other_nodes.array) : null,
-            quorum : { nodes : quorum_keys /*, threshold : 2*/ }  // fails with 2
         };
 
         return conf;

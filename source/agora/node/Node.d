@@ -28,6 +28,7 @@ import agora.consensus.data.Transaction;
 import agora.consensus.data.UTXOSet;
 import agora.consensus.EnrollmentManager;
 import agora.consensus.protocol.Nominator;
+import agora.consensus.protocol.Quorum;
 import agora.network.NetworkManager;
 import agora.node.BlockStorage;
 import agora.node.GossipProtocol;
@@ -119,7 +120,6 @@ public class Node : API
     /// The first task method, loading from disk, node discovery, etc
     public void start ()
     {
-        import scpd.scp.QuorumSetUtils;
         log.info("Doing network discovery..");
         auto peers = this.network.discover();
         this.network.retrieveLatestBlocks(this.ledger);
@@ -129,38 +129,11 @@ public class Node : API
             return;
 
         import agora.network.NetworkClient;
-        auto quorum_set = toSCPQuorumSet(this.config.quorum);
-        normalizeQSet(quorum_set);
-
-        // todo: assertion fails do the misconfigured(?) threshold of 1 which
-        // is lower than vBlockingSize in QuorumSetSanityChecker::checkSanity
-        const ExtraChecks = false;
-        enforce(isQuorumSetSane(quorum_set, ExtraChecks),
-            "Configured quorum set is not considered valid by SCP");
-
-        import agora.common.Set;
-        import std.typecons;
-
-        void getNodes (QuorumConfig conf, ref bool[PublicKey] nodes)
-        {
-            foreach (node; conf.nodes)
-                nodes[node] = true;
-
-            foreach (sub_conf; conf.quorums)
-                getNodes(sub_conf, nodes);
-        }
-
-        // can't use Set(), requires serialization support
-        bool[PublicKey] quorum_keys;
-        getNodes(this.config.quorum, quorum_keys);
-
-        auto quorum_peers = peers.byKeyValue
-            .filter!(item => item.key in quorum_keys)
-            .map!(item => tuple(item.key, item.value))
-            .assocArray();
+        auto quorum_set = makeDefaultQuorumSet(this.config.node.validators);
+        log.info("Quorum set is: {}", quorum_set);
 
         this.nominator = new Nominator(this.config.node.key_pair,
-            this.ledger, this.taskman, quorum_peers, quorum_set);
+            this.ledger, this.taskman, peers, quorum_set);
     }
 
     /***************************************************************************
