@@ -18,6 +18,15 @@
 
 module agora.node.main;
 
+/// Workaround for issue likely related to dub #225,
+/// expects a main() function and invokes it after unittesting.
+version (unittest)
+{
+    import agora.utils.Workarounds;
+    void main () { }
+}
+else:
+
 import agora.common.Config;
 import agora.node.FullNode;
 import agora.node.Validator;
@@ -30,10 +39,6 @@ import ocean.util.log.Logger;
 
 import std.getopt;
 import std.stdio;
-
-/// Workaround for issue likely related to dub #225,
-/// expects a main() function and invokes it after unittesting.
-version (unittest) void main () { } else:
 
 mixin AddLogger!();
 
