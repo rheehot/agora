@@ -26,11 +26,20 @@ module agora.utils.Workarounds;
 static if (__VERSION__ >= 2087)
     extern(C) __gshared string[] rt_options = [ "gcopt=parallel:0" ];
 
-// Workaround https://issues.dlang.org/show_bug.cgi?id=19937
-private void workaround19937 ()
+// Workarounds for https://issues.dlang.org/show_bug.cgi?id=19937
+private void workaround19937 () @safe nothrow @nogc pure
 {
     ulong x = 42;
     assert(x > 0);
-    // Thise one triggers with LDC 1.20.0
-    assert(0 < 42);
+    assert(x < 0);
+    assert(0 > x);
+    assert(0 < x);
+
+    bool b;
+    const ulong y = 42;
+    assert(y > 0);
+    // The following two are const folded
+    if (b) assert(y < 0);
+    if (b) assert(0 > y);
+    assert(0 < y);
 }
