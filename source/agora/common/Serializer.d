@@ -459,6 +459,17 @@ public void serializePart (T) (scope const auto ref T record, scope SerializeDg 
         }
     }
 
+    // Support associative arrays / hashmap serialization
+    else static if (is(T : V[K], K, V))
+    {
+        toVarInt(record.length, dg);
+        foreach (ref k, ref v; record)
+        {
+            serializePart(k, dg);
+            serializePart(v, dg);
+        }
+    }
+
     // Unsigned integer may be encoded (e.g. sizes)
     // However `ubyte` doesn't need binary encoding since they it already is the
     // smallest possible size
@@ -643,6 +654,17 @@ public T deserializeFull (T) (scope DeserializeDg dg,
         return T.init;
     }
 
+    // Support for associative arrays / hashmap deserialization
+    else static if (is(T : V[K], K, V))
+    {
+        static assert(!is(T == immutable), "`immutable` AAs are note supported as they can't be constructed");
+        Unqual!T ret;
+        size_t length = deserializeLength(dg, opts.maxLength);
+        foreach (idx; 0 .. length)
+            ret.singleEntry(deserializeFull!K(dg, opts), deserializeFull!V(dg));
+        return ret;
+    }
+
     // Enum deserialize as their base type
     else static if (is(T == enum))
     {
@@ -799,6 +821,111 @@ unittest
             const res = deserializeFull!Container2(serialized);
             assert(res == c);
         }());
+}
+
+// Tests for associative arrays
+unittest
+{
+    Hash[string] nodes;
+
+    Hash first = Hash.init;
+    nodes["first"] = first;
+
+    Hash second = first;
+    second[][0] = 0x2A;
+    nodes["second"] = second;
+
+    Hash third = second;
+    second[][1] = 0x45;
+    nodes["third"] = second;
+
+    testSymmetry!(typeof(nodes));
+    testSymmetry(nodes);
+
+    // Check size of serialized data
+    auto serialized = serializeFull(nodes);
+    assert(serialized.length ==
+           1 /* AA length is 3, encoded on 1 byte */ +
+           "first".length + "second".length + "third".length +
+           3 /* 3 x 1-byte lengths */ +
+           3 * Hash.sizeof);
+
+    // immutable AAs aren't supported, but AAs of immutable values are
+    const iNodes = serialized.deserializeFull!(immutable(Hash)[immutable(string)]);
+    foreach (ref k, ref v; iNodes)
+        assert(nodes[k] == v);
+
+    // `const` AAs are supported
+    const cNodes = serialized.deserializeFull!(const(Hash[string]));
+    foreach (ref k, ref v; cNodes)
+        assert(nodes[k] == v);
+
+    // Take out of the `static assert` to see the message
+    static assert(!is(typeof(() {
+        auto noNodes = serialized.deserializeFull!(immutable(Hash[string]));
+    })));
+}
+
+// Serialization: Multiple entries with the same key in AAs are rejected
+unittest
+{
+    import std.exception : assertThrown;
+
+    alias AAT = string[ubyte];
+
+    ubyte[] serialized = [
+        3, // AA length
+        /* K */ 42, /* V */  8, 'B', 'a', 'g', 'u', 'e', 't', 't', 'e',
+        /* K */ 84, /* V */  7, 'B', 'r', 'i', 'o', 'c', 'h', 'e',
+        /* K */ 24, /* V */ 10, 'P', 'a', 'i', 'n', ' ', 'f', 'r', 'a', 'i', 's',
+    ];
+
+    // Check that our deserialization succeeds
+    auto d1 = deserializeFull!AAT(serialized);
+    assert(d1.length == 3);
+    assert(d1[24] == "Pain frais");
+    assert(d1[42] == "Baguette");
+    assert(d1[84] == "Brioche");
+
+    // Now change a key to be a duplicate
+    serialized[1] = 24; // Was: 42
+    assertThrown!Exception(deserializeFull!AAT(serialized));
+}
+
+// Serialization: Different entry order in AA works correctly
+unittest
+{
+    alias AAT = string[ubyte];
+
+    // We have 3 entries
+    ubyte[] e24 = [
+        /* K */ 24, /* V */ 10, 'P', 'a', 'i', 'n', ' ', 'f', 'r', 'a', 'i', 's',
+    ];
+    ubyte[] e42 = [
+        /* K */ 42, /* V */  8, 'B', 'a', 'g', 'u', 'e', 't', 't', 'e',
+    ];
+    ubyte[] e84 = [
+        /* K */ 84, /* V */  7, 'B', 'r', 'i', 'o', 'c', 'h', 'e',
+    ];
+
+    // It gives us 6 permutations
+    ubyte[][] perms = [
+        [ ubyte(3) ] ~ e24 ~ e42 ~ e84,
+        [ ubyte(3) ] ~ e24 ~ e84 ~ e42,
+        [ ubyte(3) ] ~ e42 ~ e24 ~ e84,
+        [ ubyte(3) ] ~ e42 ~ e84 ~ e24,
+        [ ubyte(3) ] ~ e84 ~ e24 ~ e42,
+        [ ubyte(3) ] ~ e84 ~ e42 ~ e24,
+    ];
+
+    foreach (entry; perms)
+    {
+        auto res = deserializeFull!AAT(entry);
+        assert(res.length == 3);
+        assert(res[24] == "Pain frais");
+        assert(res[42] == "Baguette");
+        assert(res[84] == "Brioche");
+    }
 }
 
 /*******************************************************************************
@@ -968,6 +1095,54 @@ unittest
     }
     assert(deserializeFull!Foo(data) == Foo(ulong.init, 252uL, 253uL, 255uL,
         ushort.max, 0x10000u, uint.max, 0x100000000u, ulong.max));
+}
+
+/*******************************************************************************
+
+    Just like object.update, except it just checks that no double entry exists
+
+    `object.update` cannot be used for this because it assumes the AA must
+    be mutable.
+    Note that the `lazy` delegate for value is important, as we want it to
+    be evaludated *after* key (otherwise it tries to deserialize the value
+    before the key).
+
+*******************************************************************************/
+
+private void singleEntry(K, V)(ref V[K] aa, auto ref K key, lazy V newValue)
+{
+    bool found;
+    // if key is @safe-ly copyable, `update` may infer @safe
+    static if (isSafeCopyable!K)
+    {
+        auto p = () @trusted
+        {
+            return cast(Unqual!(V)*) _aaGetX(cast(AA*) &aa, typeid(V[K]), V.sizeof, &key, found);
+        } ();
+    }
+    else
+    {
+        auto p = cast(Unqual!(V)*) _aaGetX(cast(AA*) &aa, typeid(V[K]), V.sizeof, &key, found);
+    }
+    if (found)
+        throw new Exception(format("%s: Duplicated entry. Key: %s, Prev: %s, New: %s",
+            typeof(aa).stringof, key, *p, newValue));
+
+    *p = newValue;
+}
+
+// From object.d
+private enum bool isSafeCopyable(T) = is(typeof(() @safe { union U { T x; } T *x; auto u = U(*x); }));
+
+// From druntime/src/rt/aaA.d
+private extern(C)
+{
+    version (DigitalMars) private struct AA { void* impl; }
+    else version (LDC) private alias AA = void*;
+    else static assert(false, "Fix me");
+
+    void* _aaGetX(AA* paa, const TypeInfo_AssociativeArray ti, const size_t valsz,
+                  const scope void* pkey, out bool found) pure nothrow;
 }
 
 // Unittest-only utility functions
