@@ -1065,3 +1065,219 @@ public void checkFromBinary (T) ()
         immutable(T) i3 = T.fromBinary!(immutable T)(dg, opts);
     }
 }
+
+/*******************************************************************************
+
+    Test that NRVO is performed correctly on a type
+
+    NRVO (named return value optimization) is an important technique whereas
+    large types are passed as hidden pointer rather than copied or moved around.
+    Not only is it useful for performance, but it prevents structs with interior
+    pointers from breaking (e.g. `std::string`).
+
+    The check relies on a constructor taking an interior pointer, hence the data
+    in the struct does not matter.
+
+*******************************************************************************/
+
+public void testNRVO (S) ()
+{
+    alias Tested = TypeMapper!(S, SelfRef);
+
+    Tested inst;
+    pragma(msg, typeof(Tested.tupleof));
+    inst.check("Checking manually initialized value");
+
+    const data = serializeFull(inst);
+    assert(data.length);
+    inst.check("Checking that the value was not modified");
+
+    auto inst2 = deserializeFull!Tested(data);
+    inst2.check("Checking deserialized value");
+}
+
+/*******************************************************************************
+
+    Map a type to another type, applying `Map` when possible
+
+    Params:
+      TSym = The type to map.
+      Map = The mapping function. When it doesn't "return" anything,
+            that is when `is(typeof(Map!S))` is `false`, `TypeMapper` will
+            recursively descend into the type. If the above condition is `true`,
+            `TypeMapper` will alias itself to the result.
+            Implementation can recusrively call `TypeMapper` from within `Map`
+            to allow recursion to continue.
+      skipMap = A boolean to skip the application of map for this level.
+                Will not propagate. Useful when using `TypeMapper` recursively.
+
+    Returns:
+      A new type, the result of applying `Map` to `Sym` recursively.
+
+*******************************************************************************/
+
+private template TypeMapper (TSym, alias Map, bool skipMap = false)
+{
+    // If the Map function is valid, use it
+    static if (!skipMap && is(Map!TSym))
+    {
+        pragma(msg, "Aliasing: TypeMapper!", TSym, " to ", Map!TSym);
+        alias TypeMapper = Map!TSym;
+    }
+    // Otherwise get the symbol of the fields
+    else static if (is(TSym == struct))
+    {
+        static struct TypeMapper_
+        {
+            static foreach (idx, Field; typeof(TSym.tupleof))
+                mixin("TypeMapper!(Field, Map) ", __traits(identifier, TSym.tupleof[idx]), ";");
+        }
+        alias TypeMapper = TypeMapper_;
+    }
+    else static if (is(TSym == E[N], E, size_t N))
+        alias TypeMapper = TypeMapper!(E, Map)[N];
+    else static if (is(TSym == E[], E))
+        alias TypeMapper = TypeMapper!(E, Map)[];
+    else static if (is(TSym == E*, E))
+        alias TypeMapper = TypeMapper!(E, Map)*;
+    else static if (is(TSym == V[K], V, K))
+        alias TypeMapper = TypeMapper!(V, Map)[TypeMapper!(K, Map)];
+    else static if (is(TSym == class))
+        static assert(0, "`class` are not supported");
+    else
+        alias TypeMapper = TSym;
+}
+
+///
+unittest
+{
+    static struct S1
+    {
+        void* ptr;
+        void* ptr2;
+    }
+
+    static struct S2
+    {
+        S1 f1;
+        S1 f2;
+    }
+
+    static struct S3
+    {
+        S2[4] field;
+    }
+
+    template Map (T)
+    {
+        static if (is(T == E*, E))
+            alias Map = const(E)*;
+        else
+            static assert(0);
+    }
+
+    alias Mapped = TypeMapper!(S3, Map);
+    static assert(is(typeof(Mapped.field[0].f2.ptr) == const(void)*));
+}
+
+/*******************************************************************************
+
+    A self-referencing struct
+
+    This is one of the best way to check if a struct does NRVO.
+    The constructor should only be called once, and any move that elide the
+    postblit / copy ctor will lead to a different address for `&this` and `self`
+    Use `check` to get a decent error message.
+
+*******************************************************************************/
+
+public struct SelfRef (OrigType) if (is(OrigType == struct))
+{
+    private alias Hack(X) = SelfRef!X;
+
+    public alias T = TypeMapper!(OrigType, Hack, true);
+
+    // This is not enough, unfortunately
+    @disable this(this);
+    //@disable this(const ref SelfRef);
+    @disable ref SelfRef opAssign (const ref SelfRef);
+
+    // Note: Struct needs to be big enough to ensure NRVO,
+    // otherwise registers may be used
+    T value;
+    T*[8] self;
+
+    ///
+    void serialize (scope SerializeDg dg) const @safe
+    {
+        serializePart(this.value, dg);
+    }
+
+    ///
+    public static QT fromBinary (QT) (
+        scope DeserializeDg dg, const ref DeserializerOptions opts)
+        @safe
+    {
+        auto ret = QT(deserializeFull!(typeof(QT.value))(dg, opts));
+        () @trusted { (cast()ret.self[0]) = &ret.value; }();
+        return ret;
+    }
+
+    /// Check that `self is &this`
+    public void check (string message, int line = __LINE__) const
+    {
+        import std.stdio;
+
+        if ((cast(const void*) this.self[0]) !is (cast(const void*) &this))
+        {
+            writeln("Error: ", typeof(this).stringof, " ", message, " (", line,
+                    "): this=", &this, ", self=", this.self[0], ", diff=",
+                    (cast(const void*) &this) - (cast(const void*) this.self[0]));
+            assert(0);
+        }
+
+        foreach (ref field; this.tupleof)
+        {
+            static if (is(typeof(field.check(message, line))))
+                field.check(message, line);
+        }
+    }
+}
+
+///
+unittest
+{
+    static struct S0
+    {
+        ulong[4] a;
+        ulong[4] b;
+    }
+
+    static struct S1
+    {
+        SelfRef!S0 sr;
+        uint val;
+    }
+
+    static struct S2
+    {
+        S1 s1;
+        ulong val;
+    }
+
+    // Test that `fromBinary` does not disable NRVO
+    {
+        SelfRef!S0 inst1;
+        const data = serializeFull(inst1);
+        auto inst2 = deserializeFull!(SelfRef!S0)(data);
+        inst2.check("Checking deserialized value");
+    }
+
+    // Nested test
+    {
+        S2 inst1;
+        const data = serializeFull(inst1);
+        auto inst2 = deserializeFull!S2(data);
+        inst2.s1.sr.check("Checking deserialized value");
+    }
+}

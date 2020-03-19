@@ -239,7 +239,7 @@ unittest
     // SCPStatement stmt;
     // stmt.slotIndex = 42;
 
-    testDeserializeMethod!(SelfRef!PublicKey);
+    checkFromBinary!(SelfRef!PublicKey);
     //testNRVO!SCPStatement();
 
     // stmt.pledges.type_ = SCPStatementType.SCP_ST_PREPARE;
