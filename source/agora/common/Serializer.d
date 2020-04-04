@@ -99,6 +99,8 @@ import std.meta;
 import std.range;
 import std.traits;
 
+struct nrvo {}
+
 /// Pedestrian usage of serialization
 unittest
 {
@@ -165,7 +167,8 @@ unittest
             auto values = deserializeFull!(typeof(QT.values))(dg, opts);
             auto i = deserializeFull!(typeof(QT.i))(dg, opts);
             auto s = deserializeFull!(typeof(QT.s))(dg, opts);
-            return QT(values, s, i);
+            auto ret = QT(values, s, i);
+            return ret;
         }
     }
 
@@ -574,11 +577,14 @@ public T deserializeFull (T) (scope const(ubyte)[] data) @safe
 
 /// Ditto
 public T deserializeFull (T) (scope DeserializeDg dg,
-    const ref DeserializerOptions opts = DeserializerOptions.Default) @safe
+    const ref DeserializerOptions opts = DeserializerOptions.Default) @safe @nrvo
 {
     // Custom deserialization trumps everything
     static if (hasFromBinaryFunction!T)
-        return T.fromBinary!T(dg, opts);
+    {
+        auto ret = T.fromBinary!T(dg, opts);
+        return ret;
+    }
 
     // Static array needs to be handled before arrays
     // Note: This might be optimizable for small types (char, ubyte)
@@ -685,9 +691,11 @@ public T deserializeFull (T) (scope DeserializeDg dg,
     {
         Target convert (Target) ()
         {
-            return deserializeFull!Target(dg, opts);
+            auto x = deserializeFull!Target(dg, opts);
+            return x;
         }
-        return T(staticMap!(convert, Fields!T));
+        auto enableNRVO = T(staticMap!(convert, Fields!T));
+        return enableNRVO;
     }
 
     else
@@ -1216,7 +1224,7 @@ public struct SelfRef (OrigType) if (is(OrigType == struct))
     ///
     public static QT fromBinary (QT) (
         scope DeserializeDg dg, const ref DeserializerOptions opts)
-        @safe
+        @safe @nrvo
     {
         auto ret = QT(deserializeFull!(typeof(QT.value))(dg, opts));
         () @trusted { (cast()ret.self[0]) = &ret.value; }();
