@@ -382,7 +382,7 @@ public class TestAPIManager
         Shut down each of the nodes
 
     ***************************************************************************/
-
+    import std.stdio;
     public void shutdown ()
     {
         foreach (node; this.nodes)
@@ -390,6 +390,8 @@ public class TestAPIManager
 
         foreach (ref node; this.nodes)
         {
+            writeln("Shutting down ", node.key, ": ", node.client.tid());
+            //scope(failure) asm { int 3; }
             node.client.shutdown();
             node.client.ctrl.shutdown();
             node.client = null;

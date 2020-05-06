@@ -51,6 +51,17 @@ public interface ITaskManager
     ***************************************************************************/
 
     public abstract void wait (Duration dur);
+
+    /***************************************************************************
+
+        Terminates all tasks
+
+        Interrupts all pending tasks, ensuring that a caller can get a clean
+        termination after this method has returned.
+
+    ***************************************************************************/
+
+    public void shutdown ();
 }
 
 /// Exposes primitives to run tasks through Vibe.d
@@ -58,15 +69,32 @@ public class TaskManager : ITaskManager
 {
     static import vibe.core.core;
 
+    /// List of tasks we've started so far
+    private Task[] tasks;
+
     ///
     public override void runTask (void delegate() dg)
     {
-        vibe.core.core.runTask(dg);
+        const idx = this.tasks.countUntil!(val => !val.running);
+        if (idx < 0)
+            this.tasks ~= vibe.core.core.runTask(dg);
+        else
+            this.tasks[idx] = vibe.core.core.runTask(dg);
     }
 
     ///
     public override void wait (Duration dur)
     {
         vibe.core.core.sleep(dur);
+    }
+
+    ///
+    public override void shutdown ()
+    {
+        foreach (ref t; this.tasks)
+        {
+            if (t.running())
+                t.interrupt();
+        }
     }
 }

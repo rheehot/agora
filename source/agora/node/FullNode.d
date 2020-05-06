@@ -170,6 +170,8 @@ public class FullNode : API
     public void shutdown ()
     {
         log.info("Shutting down..");
+        this.taskman.shutdown();
+        this.taskman = null;
         this.network.dumpMetadata();
         this.pool.shutdown();
         this.pool = null;
