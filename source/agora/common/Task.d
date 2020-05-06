@@ -19,36 +19,54 @@ module agora.common.Task;
 
 import core.time;
 
-/// Exposes primitives to run tasks through Vibe.d
-public class TaskManager
+/// Ditto
+public interface ITaskManager
 {
     /***************************************************************************
 
-        Run an asynchronous task in vibe.d's event loop
+        Run an asynchronous task
+
+        This should run the delegate provided in its own, independent Task.
+        This function is expected to return before `dg` has completed.
 
         Params:
             dg = the delegate the task should run
 
     ***************************************************************************/
 
-    public void runTask (void delegate() dg)
-    {
-        static import vibe.core.core;
-        vibe.core.core.runTask(dg);
-    }
+    public abstract void runTask (void delegate() dg);
 
     /***************************************************************************
 
         Suspend the current task for the given duration
+
+        The currently running task is suspended, possibly giving a chance to
+        other tasks to run, and won't be active for at least `dur`.
+        Note that the next time this task is active could in practice be far
+        greater than `dur`, so user code should only rely on it being a minimum.
 
         Params:
             dur = the duration for which to suspend the task for
 
     ***************************************************************************/
 
-    public void wait (Duration dur)
+    public abstract void wait (Duration dur);
+}
+
+/// Exposes primitives to run tasks through Vibe.d
+public class TaskManager : ITaskManager
+{
+    static import vibe.core.core;
+
+    ///
+    public override void runTask (void delegate() dg)
     {
-        static import vibe.core.core;
+        vibe.core.core.runTask(dg);
+    }
+
+    ///
+    public override void wait (Duration dur)
+    {
         vibe.core.core.sleep(dur);
     }
 }

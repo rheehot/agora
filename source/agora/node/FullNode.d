@@ -78,7 +78,7 @@ public class FullNode : API
     protected const Config config;
 
     /// Task manager
-    protected TaskManager taskman;
+    protected ITaskManager taskman;
 
     /// Network of connected nodes
     protected NetworkManager network;
@@ -270,7 +270,7 @@ public class FullNode : API
 
     protected NetworkManager getNetworkManager (in NodeConfig node_config,
         in BanManager.Config banman_conf, in string[] peers,
-        in string[] dns_seeds, Metadata metadata, TaskManager taskman)
+        in string[] dns_seeds, Metadata metadata, ITaskManager taskman)
     {
         return new NetworkManager(node_config, banman_conf, peers,
             dns_seeds, metadata, taskman);
@@ -288,7 +288,7 @@ public class FullNode : API
 
     ***************************************************************************/
 
-    protected TaskManager getTaskManager ()
+    protected ITaskManager getTaskManager ()
     {
         return new TaskManager();
     }

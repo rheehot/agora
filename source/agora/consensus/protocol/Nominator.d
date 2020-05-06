@@ -57,7 +57,7 @@ public extern (C++) class Nominator : SCPDriver
     private KeyPair key_pair;
 
     /// Task manager
-    private TaskManager taskman;
+    private ITaskManager taskman;
 
     /// Ledger instance
     private Ledger ledger;
@@ -101,7 +101,7 @@ extern(D):
     ***************************************************************************/
 
     public this (NetworkManager network, KeyPair key_pair, Ledger ledger,
-        TaskManager taskman, ref const QuorumConfig config)
+        ITaskManager taskman, ref const QuorumConfig config)
     {
         this.network = network;
         this.quorum_conf = config;

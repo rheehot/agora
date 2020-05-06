@@ -51,7 +51,7 @@ class NetworkClient
     private const size_t max_retries;
 
     /// Task manager
-    private TaskManager taskman;
+    private ITaskManager taskman;
 
     /// Ban manager
     private BanManager banman;
@@ -80,7 +80,7 @@ class NetworkClient
 
     ***************************************************************************/
 
-    public this (TaskManager taskman, BanManager banman, Address address,
+    public this (ITaskManager taskman, BanManager banman, Address address,
         API api, Duration retry, size_t max_retries)
     {
         this.taskman = taskman;

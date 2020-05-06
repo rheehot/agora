@@ -231,7 +231,7 @@ public alias RemoteAPI (APIType) = geod24.LocalRest.RemoteAPI!(APIType, Serializ
 
 *******************************************************************************/
 
-public class LocalRestTaskManager : TaskManager
+public class LocalRestTaskManager : ITaskManager
 {
     static import geod24.LocalRest;
 
@@ -479,7 +479,7 @@ public class TestNetworkManager : NetworkManager
     /// Constructor
     public this (NodeConfig config, BanManager.Config ban_conf,
         in string[] peers, in string[] dns_seeds, Metadata metadata,
-        TaskManager taskman, Registry* reg)
+        ITaskManager taskman, Registry* reg)
     {
         this.registry = reg;
         super(config, ban_conf, peers, dns_seeds, metadata, taskman);
@@ -611,7 +611,7 @@ private mixin template TestNodeMixin ()
     }
 
     /// Return a LocalRest-backed task manager
-    protected override TaskManager getTaskManager ()
+    protected override LocalRestTaskManager getTaskManager ()
     {
         return new LocalRestTaskManager();
     }
@@ -620,7 +620,7 @@ private mixin template TestNodeMixin ()
     protected override NetworkManager getNetworkManager (
         in NodeConfig node_config, in BanManager.Config banman_conf,
         in string[] peers, in string[] dns_seeds, Metadata metadata,
-        TaskManager taskman)
+        ITaskManager taskman)
     {
         assert(taskman !is null);
         return new TestNetworkManager(node_config, banman_conf, peers,

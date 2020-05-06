@@ -61,7 +61,7 @@ public class NetworkManager
     protected const NodeConfig node_config = NodeConfig.init;
 
     /// Task manager
-    private TaskManager taskman;
+    private ITaskManager taskman;
 
     /// Map of Validator key => Address (for lookup in 'peers')
     protected Address[PublicKey] validator_to_addr;
@@ -99,7 +99,7 @@ public class NetworkManager
     /// Ctor
     public this (in NodeConfig node_config, in BanManager.Config banman_conf,
         in string[] peers, in string[] dns_seeds, Metadata metadata,
-        TaskManager taskman)
+        ITaskManager taskman)
     {
         this.taskman = taskman;
         this.node_config = node_config;

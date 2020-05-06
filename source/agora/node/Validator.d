@@ -128,7 +128,7 @@ public class Validator : FullNode, API
     ***************************************************************************/
 
     protected Nominator getNominator (NetworkManager network, KeyPair key_pair,
-        Ledger ledger, TaskManager taskman, in QuorumConfig quorum_config)
+        Ledger ledger, ITaskManager taskman, in QuorumConfig quorum_config)
     {
         return new Nominator(network, key_pair, ledger, taskman, quorum_config);
     }
