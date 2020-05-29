@@ -431,6 +431,14 @@ public class TestAPIManager
         this.nodes = null;
     }
 
+    public void restart (size_t index)
+    {
+        assert(index < this.nodes.length);
+        writeln("Restarting: ", this.nodes[index].address);
+        this.nodes[index].client.ctrl.restart(
+            (TestAPI node) { (cast(FullNode)node).shutdown(); });
+    }
+
     /***************************************************************************
 
         Print out the logs for each node
