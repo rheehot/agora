@@ -29,10 +29,13 @@
 
 module agora.utils.Test;
 
+import agora.common.Amount;
 import agora.common.crypto.Key;
+import agora.common.Hash;
 import agora.consensus.data.Transaction;
 import agora.consensus.Genesis;
 
+import std.algorithm;
 import std.file;
 import std.path;
 
@@ -286,7 +289,6 @@ unittest
 /// custom genesis tx
 unittest
 {
-    import std.algorithm;
     import std.exception : assumeUnique;
     import std.range;
     import core.thread;
@@ -343,4 +345,79 @@ unittest
         assert(txes[idx].inputs[0].index == idx);
         assert(txes[idx].inputs[0].previous == hashFull(genesis_block.txs[0]));
     }
+}
+
+/*******************************************************************************
+
+    Generate a new transaction that evenly splits the input accross parties
+
+*******************************************************************************/
+
+public Transaction split (TxType type = TxType.Payment)
+    (const ref Transaction input, scope const KeyPair[] from,
+     scope const PublicKey[] toward...)
+//    @safe
+{
+    Amount amount;
+    if (!input.getSumOutput(amount))
+        assert(0, "Invalid transaction passed to `split`");
+    auto remainder = amount.div(cast(uint) toward.length);
+    Transaction result = Transaction(type);
+    foreach (addr; toward)
+        result.outputs ~= Output(amount, addr);
+    result.outputs[0].value.mustAdd(remainder);
+    const inputHash = input.hashFull();
+    // TODO: Add support for Transactions with multiple recipients
+    foreach (idx, const ref _; input.outputs)
+        result.inputs ~= Input(inputHash, cast(uint) idx);
+    const resultHash = result.hashFull();
+    foreach (idx, ref in_; result.inputs)
+    {
+        auto rng = from.find!(a => a.address == input.outputs[idx].address);
+        assert(rng.length);
+        const owner = rng[0];
+        in_.signature = owner.secret.sign(resultHash[]);
+    }
+    return result;
+}
+
+/// Test for a split with the same amount of outputs as inputs
+/// Essentially doing an equality transformation
+unittest
+{
+    import std.range;
+
+    KeyPair[] keys = iota(8).map!(_ => KeyPair.random()).array;
+    KeyPair genesisKP = getGenesisKeyPair();
+    const first = GenesisBlock.txs[0];
+    const equalTx = first.split([genesisKP], keys.map!(k => k.address).array);
+    // This transaction has 8 txs, hence it's just equality
+    assert(equalTx.inputs.length == 8);
+    assert(equalTx.outputs.length == 8);
+    // Since the amount is evenly distributed in Genesis,
+    // they all have the same value
+    const ExpectedAmount = first.outputs[0].value;
+    assert(equalTx.outputs.all!(val => val.value == ExpectedAmount));
+}
+
+/// Test with twice as many outputs as inputs
+unittest
+{
+    import std.stdio;
+    import std.range;
+
+    KeyPair[] keys = iota(16).map!(_ => KeyPair.random()).array;
+    // Use Genesis
+}
+
+/// Test with remainder
+unittest
+{
+    import std.stdio;
+    import std.range;
+
+    KeyPair[] keys = iota(3).map!(_ => KeyPair.random()).array;
+    // Use Genesis
+    const result = first.split(...);
+    assert(result.output[0].value == ...);
 }
