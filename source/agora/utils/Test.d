@@ -31,6 +31,7 @@ module agora.utils.Test;
 
 import agora.common.Amount;
 import agora.common.crypto.Key;
+import agora.common.crypto.Schnorr;
 import agora.common.Hash;
 import agora.consensus.data.Transaction;
 import agora.consensus.Genesis;
@@ -624,22 +625,121 @@ unittest
     }
 }
 
+/// A reference to an output
+public struct OutputRef
+{
+    ///
+    public Hash hash () const nothrow @safe
+    {
+        import agora.consensus.UTXOSet;
+        return UTXOSet.getHash(this.tx.hashFull(), this.index);
+    }
+
+    ///
+    public ref inout(Output) output () inout @safe pure nothrow @nogc
+    {
+        return this.tx.outputs[index];
+    }
+
+    ///
+    public Transaction tx;
+    ///
+    public uint        index;
+}
+
+/// Get an `OutputRef` from a `Transaction`
+public inout(OutputRef) oref (inout Transaction tx, uint index)
+{
+    assert(tx.outputs.length > index);
+    return inout(OutputRef)(tx, index);
+}
+
+/// Get a range of all OutputRef from a `Transaction`
+public auto oref (const Transaction tx)
+{
+    import std.range;
+    return iota(tx.outputs.length).map!(idx => const(OutputRef)(tx, cast(uint)idx));
+}
+
+/*******************************************************************************
+
+    An helper utility to build transactions
+
+    This utility uses well-known keys (`WK.Keys`) for signature and expect
+    output created (via `split`, `merge`, etc...) to use them as addresses.
+
+*******************************************************************************/
+
+public struct TxBuilder
+{
+    public Transaction sign (TxType type = TxType.Payment)
+    {
+        assert(this.inputs.length, "Cannot sign input-less transaction");
+        assert(this.data.outputs.length, "Onput-less transactions are not valid");
+
+        this.data.type = type;
+
+        // Finalize the transaction by adding inputs
+        foreach (ref in_; this.inputs)
+            this.data.inputs ~= Input(in_.hash(), in_.index);
+
+        // Get the hash to sign
+        const txHash = this.data.hashFull();
+        // Sign all inputs using WK keys
+        foreach (idx, ref in_; this.inputs)
+        {
+            auto ownerKP = WK.Keys[in_.output.address];
+            assert(ownerKP !is KeyPair.init,
+                   "Address not found in Well-Known keypairs: "
+                   ~ in_.output.address.toString());
+            auto pair = Pair(ownerKP.secret.secretKeyToCurveScalar());
+            pair.V = pair.v.toPoint();
+            this.data.inputs[idx].signature = .sign(pair, txHash);
+        }
+
+        // Return the result and reset this
+        this.inputs = null;
+        scope (success) this.data = Transaction.init;
+        return this.data;
+    }
+
+    public void split (scope const PublicKey[] toward...)
+    {
+        Amount amount;
+        scope bool delegate (OutputRef) dg = (val) => amount.add(val.output.value);
+        if (!this.inputs.all!dg)
+            assert(0, "Amount overflow");
+        auto remainder = amount.div(toward.length);
+
+        this.data.outputs = null;
+        foreach (key; toward)
+            this.data.outputs ~= Output(amount, key);
+        this.data.outputs[0].value.mustAdd(remainder);
+    }
+
+    /// Stores the inputs to consume until `sign` is called
+    private OutputRef[] inputs;
+    ///
+    private Transaction data;
+}
+
+
 /*******************************************************************************
 
     Generate a new transaction that evenly splits the input accross parties
 
-    The `input` transaction will be split evenly in `toward.length` outputs,
-    each of which will be controlled by a key in `toward`.
-    If the sum of outputs in the transaction is not a multiple of
-    `toward.length`, the leftover `Amount` will be added to
-    the output for `toward[0]`.
-    Like other testing utilities, if an error happens (e.g. `input` is invalid,
-    or `from` is missing some keys), an `assert` will be triggered.
+    The `Output` provided as `input`  will be split evenly between
+    `toward.length` new `Output`s, each of which will be controlled by a key
+    in `toward`.
+    If the amount controlled by `input` is not a multiple of `toward.length`,
+    the leftover `Amount` will be added to the output for `toward[0]`.
+    Like other testing utilities, if invalid data is provided or an error
+    happens, an `assert` will be triggered.
 
     Params:
         type = Type of transaction to generate (frozen or simple payment)
-        input = Transaction to spend completely
-        from = Array of keys controlling all the outputs in `input`
+        input = Reference to the `Output` to spend completely
+        from = Key controlling `input`
         toward = Receivers for the newly-created output
 
     Returns:
@@ -648,7 +748,31 @@ unittest
 *******************************************************************************/
 
 public Transaction split (TxType type = TxType.Payment)
-    (const ref Transaction input, scope const KeyPair[] from,
+    (scope OutputRef input, scope KeyPair from, scope const PublicKey[] toward...)
+    @safe
+{
+    Amount amount = input.amount;
+    auto remainder = amount.div(toward.length);
+    Transaction result = Transaction(type);
+    foreach (addr; toward)
+        result.outputs ~= Output(amount, addr);
+
+    // Add the remainder to the first output.
+    result.outputs[0].value.mustAdd(remainder);
+    // One input, possibly multiple outputs
+    result.inputs ~= Input(input.hash(), input.index);
+
+    scope sign = (KeyPair kp, Hash h) @trusted { return kp.secret.sign(h[]); };
+
+    const resultHash = result.hashFull();
+    foreach (idx, ref in_; result.inputs)
+        in_.signature = sign(from, resultHash);
+    return result;
+}
+
+/// Similar to `split(OutputRef)`, , but operate on Transactions
+public Transaction split (TxType type = TxType.Payment)
+    (scope Transaction input, scope const KeyPair[] from,
      scope const PublicKey[] toward...)
     @safe
 {
@@ -663,22 +787,14 @@ public Transaction split (TxType type = TxType.Payment)
 
     // Add the remainder to the first output.
     result.outputs[0].value.mustAdd(remainder);
-    const inputHash = input.hashFull();
-
-    // Add support for Transactions with multiple recipients
-    foreach (idx, const ref _; input.outputs)
-        result.inputs ~= Input(inputHash, cast(uint) idx);
+    // One input, possibly multiple outputs
+    result.inputs ~= Input(input.hash(), input.index);
 
     scope sign = (KeyPair kp, Hash h) @trusted { return kp.secret.sign(h[]); };
 
     const resultHash = result.hashFull();
     foreach (idx, ref in_; result.inputs)
-    {
-        auto rng = from.find!(a => a.address == input.outputs[idx].address);
-        assert(rng.length);
-        const owner = rng[0];
-        in_.signature = sign(owner, resultHash);
-    }
+        in_.signature = sign(from, resultHash);
     return result;
 }
 
@@ -691,7 +807,7 @@ unittest
     KeyPair[] keys = iota(8).map!(_ => KeyPair.random()).array;
     KeyPair genesisKP = getGenesisKeyPair();
     const first = GenesisBlock.txs[0];
-    const equalTx = first.split([genesisKP], keys.map!(k => k.address).array);
+    const equalTx = first.oref.array.split([genesisKP], keys.map!(k => k.address).array);
     // This transaction has 8 txs, hence it's just equality
     assert(equalTx.inputs.length == 8);
     assert(equalTx.outputs.length == 8);
