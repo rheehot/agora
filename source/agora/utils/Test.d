@@ -193,12 +193,12 @@ public Transaction[] makeChainedTransactions (KeyPair key_pair,
     // transactions, and subsequent blocks have transactions which
     // spend the only outputs in the transaction from the previous block
 
-    Transaction[] transactions;
+    TxBuilder[] transactions = new TxBuilder(TxCount);
 
     // always use the same amount, for simplicity
     const Amount AmountPerTx = spend_amount / Block.TxsInBlock;
 
-    foreach (idx; 0 .. TxCount)
+    foreach (idx, ref txb; transactions)
     {
         Input input;
         if (prev_txs.length == 0)  // refering to genesis tx's outputs
@@ -209,6 +209,11 @@ public Transaction[] makeChainedTransactions (KeyPair key_pair,
         {
             input = Input(hashFull(prev_txs[idx % Block.TxsInBlock]), 0);
         }
+
+        // Set input for txb
+        // Populate outputs
+        // return transactions.map!(tx => tx.sign()).array;
+
 
         Transaction tx =
         {
