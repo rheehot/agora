@@ -44,11 +44,11 @@ unittest
     auto node_1 = nodes[0];
 
     Transaction[][] block_txes; /// per-block array of transactions (genesis not included)
-    Transaction[] last_txs;
+    const(Transaction)[] last_txs = genesisSpendable().array;
     foreach (block_idx; 0 .. 10)  // create 10 blocks
     {
         // create enough tx's for a single block
-        auto txs = makeChainedTransactions(getGenesisKeyPair(), last_txs, 1);
+        auto txs = makeChainedTransactions([WK.Keys.A.address], last_txs, 1);
 
         // send it to one node
         txs.each!(tx => node_1.putTransaction(tx));
@@ -103,7 +103,7 @@ unittest
     // ignore transaction propagation and periodically retrieve blocks via getBlocksFrom
     nodes[1 .. $].each!(node => node.filter!(node.putTransaction));
 
-    auto txs = makeChainedTransactions(getGenesisKeyPair(), null, 2);
+    auto txs = makeChainedTransactions([WK.Keys.A.address], genesisSpendable(), 2);
     txs.each!(tx => node_1.putTransaction(tx));
     containSameBlocks(nodes, 2).retryFor(8.seconds);
 }
@@ -121,7 +121,7 @@ unittest
     auto node_1 = nodes[0];
 
     auto gen_key_pair = getGenesisKeyPair();
-    auto txs = makeChainedTransactions(gen_key_pair, null, 1);
+    auto txs = makeChainedTransactions([WK.Keys.A.address], genesisSpendable(), 1);
     txs.each!(tx => node_1.putTransaction(tx));
 
     Hash[] hashes;
@@ -182,15 +182,15 @@ unittest
     auto nodes = network.clients;
     auto node_1 = nodes[0];
 
-    auto txs = makeChainedTransactions(getGenesisKeyPair(), null, 1);
+    auto txs = makeChainedTransactions([WK.Keys.A.address], genesisSpendable(), 1);
     txs.each!(tx => node_1.putTransaction(tx));
     containSameBlocks(nodes, 1).retryFor(3.seconds);
 
-    txs = makeChainedTransactions(getGenesisKeyPair(), txs, 1);
+    txs = makeChainedTransactions([WK.Keys.A.address], txs, 1);
     txs.each!(tx => node_1.putTransaction(tx));
     containSameBlocks(nodes, 2).retryFor(3.seconds);
 
-    txs = makeChainedTransactions(getGenesisKeyPair(), txs, 1);
+    txs = makeChainedTransactions([WK.Keys.A.address], txs, 1);
 
     // create a deep-copy of the first tx
     auto backup_tx = deserializeFull!Transaction(serializeFull(txs[0]));

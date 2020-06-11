@@ -37,9 +37,9 @@ unittest
 
     nodes.each!(node => assert(node.getBlockHeight() == 0));
 
-    Transaction[] last_txs;
+    const(Transaction)[] last_txs = genesisSpendable().array;
     // create enough tx's for a single block
-    auto txs = makeChainedTransactions(getGenesisKeyPair(), last_txs, 1);
+    auto txs = makeChainedTransactions([WK.Keys.A.address], last_txs, 1);
 
     auto send_txs = txs[0..$-1];
     // send it to tx to node
@@ -82,7 +82,7 @@ unittest
     auto nodes = network.clients;
     auto node_1 = nodes[0];
 
-    auto txs = makeChainedTransactions(getGenesisKeyPair(), null, 1);
+    auto txs = makeChainedTransactions([WK.Keys.A.address], genesisSpendable(), 1);
 
     auto send_txs = txs[0 .. $ - 1];  // 1 short of making a block (don't start consensus)
     send_txs.each!(tx => node_1.putTransaction(tx));
