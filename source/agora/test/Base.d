@@ -194,7 +194,7 @@ public struct Serializer
 {
     import agora.common.Serializer;
 
-    static immutable(ubyte)[] serialize (T) (auto ref T value) @trusted nothrow
+    static immutable(ubyte)[] serialize (T) (in T value) @trusted nothrow
     {
         // `serializeFull` should be `@safe`, but `assumeUnique` is not
         try
@@ -211,7 +211,7 @@ public struct Serializer
         }
     }
 
-    static QT deserialize (QT) (scope immutable(ubyte)[] data) @trusted nothrow
+    static QT deserialize (QT) (in ubyte[] data) @trusted nothrow
     {
         try
             return deserializeFull!QT(data);

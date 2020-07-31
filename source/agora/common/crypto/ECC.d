@@ -88,7 +88,7 @@ public struct Scalar
     }
 
     /// Expose `toString`
-    public void toString (scope void delegate(const(char)[]) @safe dg)
+    public void toString (scope void delegate(in char[]) @safe dg)
         const @safe
     {
         this.data.toString(dg);
@@ -101,13 +101,13 @@ public struct Scalar
     }
 
     /// Vibe.d deserialization
-    public static Scalar fromString (scope const(char)[] str) @safe
+    public static Scalar fromString (in char[] str) @safe
     {
         return Scalar(typeof(this.data).fromString(str));
     }
 
     /// Operator overloads for `+`, `-`, `*`
-    public Scalar opBinary (string op)(const scope auto ref Scalar rhs)
+    public Scalar opBinary (string op)(in Scalar rhs)
         const nothrow @nogc @trusted
     {
         Scalar result = void;
@@ -204,7 +204,7 @@ public struct Point
     }
 
     /// Expose `toString`
-    public void toString (scope void delegate(const(char)[]) @safe dg)
+    public void toString (scope void delegate(in char[]) @safe dg)
         const @safe
     {
         this.data.toString(dg);
@@ -217,13 +217,13 @@ public struct Point
     }
 
     /// Vibe.d deserialization
-    public static Point fromString (scope const(char)[] str) @safe
+    public static Point fromString (in char[] str) @safe
     {
         return Point(typeof(this.data).fromString(str));
     }
 
     /// Operator overloads for points additions
-    public Point opBinary (string op)(const scope auto ref Point rhs)
+    public Point opBinary (string op)(in Point rhs)
         const nothrow @nogc @trusted
         if (op == "+" || op == "-")
     {
@@ -245,7 +245,7 @@ public struct Point
     }
 
     /// Operator overloads for scalar multiplication
-    public Point opBinary (string op)(const scope auto ref Scalar rhs)
+    public Point opBinary (string op)(in Scalar rhs)
         const nothrow @nogc @trusted
         if (op == "*")
     {
@@ -257,7 +257,7 @@ public struct Point
     }
 
     /// Ditto
-    public Point opBinaryRight (string op)(const scope auto ref Scalar lhs)
+    public Point opBinaryRight (string op)(in Scalar lhs)
         const nothrow @nogc @trusted
         if (op == "*")
     {
@@ -275,13 +275,7 @@ public struct Point
     }
 
     /// Support for comparison
-    public int opCmp (ref const typeof(this) s) const
-    {
-        return this.data.opCmp(s.data);
-    }
-
-    /// Support for comparison (rvalue overload)
-    public int opCmp (const typeof(this) s) const
+    public int opCmp (in typeof(this) s) const
     {
         return this.data.opCmp(s.data);
     }

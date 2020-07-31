@@ -160,7 +160,7 @@ public struct Pair
 }
 
 /// Single-signer trivial API
-public Signature sign (T) (const ref Pair kp, auto ref T data)
+public Signature sign (T) (const ref Pair kp, in T data)
     nothrow @nogc @safe
 {
     const R = Pair.random();
@@ -168,7 +168,7 @@ public Signature sign (T) (const ref Pair kp, auto ref T data)
 }
 
 /// Single-signer privkey API
-public Signature sign (T) (const ref Scalar privateKey, T data)
+public Signature sign (T) (in Scalar privateKey, T data)
     nothrow @nogc @safe
 {
     const R = Pair.random();
@@ -176,16 +176,13 @@ public Signature sign (T) (const ref Scalar privateKey, T data)
 }
 
 /// Sign with a given `r` (warning: `r` should never be reused with `x`)
-public Signature sign (T) (const ref Pair kp, const ref Pair r, auto ref T data)
+public Signature sign (T) (in Pair kp, in Pair r, in T data)
 {
     return sign!T(kp.v, kp.V, r.V, r.v, data);
 }
 
 /// Complex API, allow multisig
-public Signature sign (T) (
-    const ref Scalar x, const ref Point X,
-    const ref Point R, const ref Scalar r,
-    auto ref T data)
+public Signature sign (T) (in Scalar x, in Point X, in Point R, in Scalar r, in T data)
     nothrow @nogc @trusted
 {
     /*
@@ -227,7 +224,7 @@ public Signature sign (T) (
 
 *******************************************************************************/
 
-public bool verify (T) (const ref Point X, const ref Signature sig, auto ref T data)
+public bool verify (T) (in Point X, in Signature sig, in T data)
     nothrow @nogc @trusted
 {
     Sig s = Sig.fromBlob(sig);
