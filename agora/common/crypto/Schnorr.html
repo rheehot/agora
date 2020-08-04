@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<title>Module agora.common.crypto.Schnorr</title>
+		<link rel="stylesheet" type="text/css" href="../../../styles/ddox.css"/>
+		<link rel="stylesheet" href="../../../prettify/prettify.css" type="text/css"/>
+		<script type="text/javascript" src="../../../scripts/jquery.js">/**/</script><script type="text/javascript" src="../../../scripts/ddox.js">/**/</script>
+	</head>
+	<body onload="setupDdox();">
+		<nav id="main-nav">
+			<noscript>
+				<p style="color: red">The search functionality needs JavaScript enabled</p>
+			</noscript>
+			<div id="symbolSearchPane" style="display: none">
+				<form action="#" method="GET">
+					<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(40);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();"/>
+				</form>
+				<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../../../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../../../";
+$('#symbolSearchPane').show();</script>
+			</div>
+			<ul class="tree-view">
+				<li class="tree-view ">
+					<div class="package ">agora
+					</div>
+			<ul class="tree-view">
+				<li class="tree-view collapsed">
+					<div class="package ">api
+					</div>
+			<ul class="tree-view">
+				<li class="tree-view collapsed">
+					<div class="package ">handler
+					</div>
+			<ul class="tree-view">
+				<li>
+					<div class="module ">
+						<a href="../../../agora/api/handler/BlockExternalizedHandler.html">BlockExternalizedHandler</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/api/handler/PreImageReceivedHandler.html">PreImageReceivedHandler</a>
+					</div>
+				</li>
+			</ul>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/api/FullNode.html">FullNode</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/api/Validator.html">Validator</a>
+					</div>
+				</li>
+			</ul>
+				</li>
+				<li class="tree-view ">
+					<div class="package ">common
+					</div>
+			<ul class="tree-view">
+				<li class="tree-view ">
+					<div class="package ">crypto
+					</div>
+			<ul class="tree-view">
+				<li>
+					<div class="module ">
+						<a href="../../../agora/common/crypto/Crc16.html">Crc16</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/common/crypto/ECC.html">ECC</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/common/crypto/Key.html">Key</a>
+					</div>
+				</li>
+				<li>
+					<div class="module selected">
+						<a href="../../../agora/common/crypto/Schnorr.html">Schnorr</a>
+					</div>
+				</li>
+			</ul>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/common/Amount.html">Amount</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/common/BanManager.html">BanManager</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/common/BitField.html">BitField</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/common/Config.html">Config</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/common/Hash.html">Hash</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/common/ManagedDatabase.html">ManagedDatabase</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/common/Metadata.html">Metadata</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/common/SCPHash.html">SCPHash</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/common/Serializer.html">Serializer</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/common/Set.html">Set</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/common/Task.html">Task</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/common/TransactionPool.html">TransactionPool</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/common/Types.html">Types</a>
+					</div>
+				</li>
+			</ul>
+				</li>
+				<li class="tree-view collapsed">
+					<div class="package ">consensus
+					</div>
+			<ul class="tree-view">
+				<li class="tree-view collapsed">
+					<div class="package ">data
+					</div>
+			<ul class="tree-view">
+				<li class="tree-view collapsed">
+					<div class="package ">
+						<a href="../../../agora/consensus/data/genesis.html">genesis</a>
+					</div>
+			<ul class="tree-view">
+				<li>
+					<div class="module ">
+						<a href="../../../agora/consensus/data/genesis/Coinnet.html">Coinnet</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/consensus/data/genesis/Test.html">Test</a>
+					</div>
+				</li>
+			</ul>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/consensus/data/Block.html">Block</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/consensus/data/ConsensusData.html">ConsensusData</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/consensus/data/ConsensusParams.html">ConsensusParams</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/consensus/data/Enrollment.html">Enrollment</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/consensus/data/PreImageInfo.html">PreImageInfo</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/consensus/data/Transaction.html">Transaction</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/consensus/data/UTXOSetValue.html">UTXOSetValue</a>
+					</div>
+				</li>
+			</ul>
+				</li>
+				<li class="tree-view collapsed">
+					<div class="package ">protocol
+					</div>
+			<ul class="tree-view">
+				<li>
+					<div class="module ">
+						<a href="../../../agora/consensus/protocol/Nominator.html">Nominator</a>
+					</div>
+				</li>
+			</ul>
+				</li>
+				<li class="tree-view collapsed">
+					<div class="package ">
+						<a href="../../../agora/consensus/validation.html">validation</a>
+					</div>
+			<ul class="tree-view">
+				<li>
+					<div class="module ">
+						<a href="../../../agora/consensus/validation/Block.html">Block</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/consensus/validation/Enrollment.html">Enrollment</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/consensus/validation/PreImage.html">PreImage</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/consensus/validation/Transaction.html">Transaction</a>
+					</div>
+				</li>
+			</ul>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/consensus/EnrollmentManager.html">EnrollmentManager</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/consensus/EnrollmentPool.html">EnrollmentPool</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/consensus/PreImage.html">PreImage</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/consensus/Quorum.html">Quorum</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/consensus/UTXOSet.html">UTXOSet</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/consensus/ValidatorSet.html">ValidatorSet</a>
+					</div>
+				</li>
+			</ul>
+				</li>
+				<li class="tree-view collapsed">
+					<div class="package ">network
+					</div>
+			<ul class="tree-view">
+				<li>
+					<div class="module ">
+						<a href="../../../agora/network/NetworkClient.html">NetworkClient</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/network/NetworkManager.html">NetworkManager</a>
+					</div>
+				</li>
+			</ul>
+				</li>
+				<li class="tree-view collapsed">
+					<div class="package ">node
+					</div>
+			<ul class="tree-view">
+				<li>
+					<div class="module ">
+						<a href="../../../agora/node/BlockStorage.html">BlockStorage</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/node/FullNode.html">FullNode</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/node/Ledger.html">Ledger</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/node/main.html">main</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/node/Runner.html">Runner</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/node/Validator.html">Validator</a>
+					</div>
+				</li>
+			</ul>
+				</li>
+				<li class="tree-view collapsed">
+					<div class="package ">test
+					</div>
+			<ul class="tree-view">
+				<li>
+					<div class="module ">
+						<a href="../../../agora/test/BanManager.html">BanManager</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/test/Base.html">Base</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/test/EnrollmentManager.html">EnrollmentManager</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/test/GenesisBlock.html">GenesisBlock</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/test/GossipProtocol.html">GossipProtocol</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/test/Ledger.html">Ledger</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/test/ManyValidators.html">ManyValidators</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/test/NetworkClient.html">NetworkClient</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/test/NetworkDiscovery.html">NetworkDiscovery</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/test/NetworkManager.html">NetworkManager</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/test/Quorum.html">Quorum</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/test/QuorumPreimage.html">QuorumPreimage</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/test/Restart.html">Restart</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/test/Simple.html">Simple</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/test/ValidatorCount.html">ValidatorCount</a>
+					</div>
+				</li>
+			</ul>
+				</li>
+				<li class="tree-view collapsed">
+					<div class="package ">utils
+					</div>
+			<ul class="tree-view">
+				<li>
+					<div class="module ">
+						<a href="../../../agora/utils/Log.html">Log</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/utils/PrettyPrinter.html">PrettyPrinter</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/utils/SCPPrettyPrinter.html">SCPPrettyPrinter</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/utils/Test.html">Test</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../agora/utils/WellKnownKeys.html">WellKnownKeys</a>
+					</div>
+				</li>
+			</ul>
+				</li>
+			</ul>
+				</li>
+				<li class="tree-view collapsed">
+					<div class="package ">scpd
+					</div>
+			<ul class="tree-view">
+				<li class="tree-view collapsed">
+					<div class="package ">quorum
+					</div>
+			<ul class="tree-view">
+				<li>
+					<div class="module ">
+						<a href="../../../scpd/quorum/QuorumIntersectionChecker.html">QuorumIntersectionChecker</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../scpd/quorum/QuorumTracker.html">QuorumTracker</a>
+					</div>
+				</li>
+			</ul>
+				</li>
+				<li class="tree-view collapsed">
+					<div class="package ">scp
+					</div>
+			<ul class="tree-view">
+				<li>
+					<div class="module ">
+						<a href="../../../scpd/scp/BallotProtocol.html">BallotProtocol</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../scpd/scp/LocalNode.html">LocalNode</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../scpd/scp/NominationProtocol.html">NominationProtocol</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../scpd/scp/QuorumSetUtils.html">QuorumSetUtils</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../scpd/scp/SCP.html">SCP</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../scpd/scp/SCPDriver.html">SCPDriver</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../scpd/scp/Slot.html">Slot</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../scpd/scp/Utils.html">Utils</a>
+					</div>
+				</li>
+			</ul>
+				</li>
+				<li class="tree-view collapsed">
+					<div class="package ">tests
+					</div>
+			<ul class="tree-view">
+				<li>
+					<div class="module ">
+						<a href="../../../scpd/tests/GlueTypes.html">GlueTypes</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../scpd/tests/LayoutTest.html">LayoutTest</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../scpd/tests/SizeTest.html">SizeTest</a>
+					</div>
+				</li>
+			</ul>
+				</li>
+				<li class="tree-view collapsed">
+					<div class="package ">types
+					</div>
+			<ul class="tree-view">
+				<li>
+					<div class="module ">
+						<a href="../../../scpd/types/Stellar_SCP.html">Stellar_SCP</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../scpd/types/Stellar_types.html">Stellar_types</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../scpd/types/Utils.html">Utils</a>
+					</div>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../scpd/types/XDRBase.html">XDRBase</a>
+					</div>
+				</li>
+			</ul>
+				</li>
+				<li>
+					<div class="module ">
+						<a href="../../../scpd/Cpp.html">Cpp</a>
+					</div>
+				</li>
+			</ul>
+				</li>
+			</ul>
+		</nav>
+		<div id="main-contents">
+			<h1>Module agora.common.crypto.Schnorr</h1><p>Low level utilities to perform Schnorr signatures on Curve25519.
+</p><section><p>Through this module, lowercase letters represent scalars and uppercase
+    letters represent points. Multiplication of a scalar by a point,
+    which is adding a point to itself multiple times, is represented with '*',
+    e.g. <code class="lang-d"><span class="pln">a </span><span class="pun">* </span><span class="pln">G</span></code>. Uppercase letters are point representations of scalars,
+    that is, the scalar multipled by the generator, e.g. <code class="lang-d"><span class="pln">r </span><span class="pun">== </span><span class="pln">r </span><span class="pun">* </span><span class="pln">G</span></code>.
+    <code class="lang-d"><span class="pln">x</span></code> is the private key, <code class="lang-d"><span class="pln">X</span></code> is the public key, and <code class="lang-d"><span class="pln">H</span><span class="pun">()</span></code> is the Blake2b
+    512 bits hash reduced to a scalar in the field.
+</p>
+
+<p>    Following the Schnorr BIP (see links), signatures are of the form
+    <code class="lang-d"><span class="pun">(</span><span class="pln">R</span><span class="pun">,</span><span class="pln">s</span><span class="pun">)</span></code> and satisfy <code class="lang-d"><span class="pln">s </span><span class="pun">* </span><span class="pln">G </span><span class="pun">= </span><span class="pln">R </span><span class="pun">+ </span><span class="pln">H</span><span class="pun">(</span><span class="pln">X </span><span class="pun">|| </span><span class="pln">R </span><span class="pun">|| </span><span class="pln">m</span><span class="pun">) * </span><span class="pln">X</span></code>.
+    <code class="lang-d"><span class="pln">r</span></code> is refered to as the nonce and is a cryptographically randomly
+    generated number that should neither be reused nor leaked.
+</p>
+</section>
+
+			<section><section><h2>Signature Aggregation</h2>
+<p>Since Schnorr signatures use a linear equation, they can be simply
+    combined with addition, enabling <code class="lang-d"><span class="pln">O</span><span class="pun">(</span><span class="lit">1</span><span class="pun">)</span></code> signature verification
+    time and <code class="lang-d"><span class="pln">O</span><span class="pun">(</span><span class="lit">1</span><span class="pun">)</span></code> and <code class="lang-d"><span class="pln">O</span><span class="pun">(</span><span class="lit">1</span><span class="pun">)</span></code> signature size.
+    Additionally, since the <code class="lang-d"><span class="pln">c</span></code> factor does not depend on EC operation,
+    we can do batch verification, enabling us to speed up verification
+    when verifying large amount of data (e.g. a block).
+</p>
+</section>
+<section><h2>See Also</h2>
+<p>- https://en.wikipedia.org/wiki/Curve25519
+      - https://en.wikipedia.org/wiki/Schnorr_signature
+      - https://github.com/sipa/bips/blob/bip-schnorr/bip-schnorr.mediawiki
+      - https://www.secg.org/sec1-v2.pdf
+</p>
+</section>
+<section><h2>TODO</h2>
+<p>- Compress signature according to SEC1 v2 (Section 2.3) (#304)
+      - Audit GDC and LDC generated code
+      - Proper audit
+</p>
+</section>
+<section><h2>Example</h2>
+<p>Single signature example
+</p>
+<pre class="code"><code class="lang-d"><a href="../../../agora/common/crypto/Schnorr/Pair.html"><span class="typ">Pair</span></a><span class="pln"> kp </span><span class="pun">= <a href="../../../agora/common/crypto/Schnorr/Pair.random.html"></span><span class="typ">Pair<wbr/></span><span class="pun">.</span><span class="pln">random</span></a><span class="pun">();
+</span><span class="kwd">auto </span><span class="pln">signature </span><span class="pun">= <a href="../../../agora/common/crypto/Schnorr/sign.html"></span><span class="pln">sign</span></a><span class="pun">(</span><span class="pln">kp</span><span class="pun">, </span><span class="str">"Hello world"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(<a href="../../../agora/common/crypto/Schnorr/verify.html"></span><span class="pln">verify</span></a><span class="pun">(</span><span class="pln">kp<wbr/></span><span class="pun">.</span><span class="pln">V</span><span class="pun">, </span><span class="pln">signature</span><span class="pun">, </span><span class="str">"Hello world"</span><span class="pun">));
+</span></code></pre>
+</section>
+<section><h2>Example</h2>
+<p>Multi-signature example
+</p>
+<pre class="code"><code class="lang-d"><span class="com">// Setup
+</span><span class="kwd">static immutable </span><span class="typ">string </span><span class="pln">secret </span><span class="pun">= </span><span class="str">"BOSAGORA for the win"</span><span class="pun">;
+<a href="../../../agora/common/crypto/Schnorr/Pair.html"></span><span class="typ">Pair</span></a><span class="pln"> kp1 </span><span class="pun">= <a href="../../../agora/common/crypto/Schnorr/Pair.random.html"></span><span class="typ">Pair<wbr/></span><span class="pun">.</span><span class="pln">random</span></a><span class="pun">();
+<a href="../../../agora/common/crypto/Schnorr/Pair.html"></span><span class="typ">Pair</span></a><span class="pln"> kp2 </span><span class="pun">= <a href="../../../agora/common/crypto/Schnorr/Pair.random.html"></span><span class="typ">Pair<wbr/></span><span class="pun">.</span><span class="pln">random</span></a><span class="pun">();
+<a href="../../../agora/common/crypto/Schnorr/Pair.html"></span><span class="typ">Pair</span></a><span class="pln"> R1 </span><span class="pun">= <a href="../../../agora/common/crypto/Schnorr/Pair.random.html"></span><span class="typ">Pair<wbr/></span><span class="pun">.</span><span class="pln">random</span></a><span class="pun">();
+<a href="../../../agora/common/crypto/Schnorr/Pair.html"></span><span class="typ">Pair</span></a><span class="pln"> R2 </span><span class="pun">= <a href="../../../agora/common/crypto/Schnorr/Pair.random.html"></span><span class="typ">Pair<wbr/></span><span class="pun">.</span><span class="pln">random</span></a><span class="pun">();
+</span><span class="typ">Point </span><span class="pln">R </span><span class="pun">= </span><span class="pln">R1<wbr/></span><span class="pun">.</span><span class="pln">V </span><span class="pun">+ </span><span class="pln">R2<wbr/></span><span class="pun">.</span><span class="pln">V</span><span class="pun">;
+</span><span class="typ">Point </span><span class="pln">X </span><span class="pun">= </span><span class="pln">kp1<wbr/></span><span class="pun">.</span><span class="pln">V </span><span class="pun">+ </span><span class="pln">kp2<wbr/></span><span class="pun">.</span><span class="pln">V</span><span class="pun">;
+
+</span><span class="kwd">const </span><span class="pln">sig1 </span><span class="pun">= <a href="../../../agora/common/crypto/Schnorr/sign.html"></span><span class="pln">sign</span></a><span class="pun">(</span><span class="pln">kp1<wbr/></span><span class="pun">.</span><span class="pln">v</span><span class="pun">, </span><span class="pln">X</span><span class="pun">, </span><span class="pln">R</span><span class="pun">, </span><span class="pln">R1<wbr/></span><span class="pun">.</span><span class="pln">v</span><span class="pun">, </span><span class="pln">secret</span><span class="pun">);
+</span><span class="kwd">const </span><span class="pln">sig2 </span><span class="pun">= <a href="../../../agora/common/crypto/Schnorr/sign.html"></span><span class="pln">sign</span></a><span class="pun">(</span><span class="pln">kp2<wbr/></span><span class="pun">.</span><span class="pln">v</span><span class="pun">, </span><span class="pln">X</span><span class="pun">, </span><span class="pln">R</span><span class="pun">, </span><span class="pln">R2<wbr/></span><span class="pun">.</span><span class="pln">v</span><span class="pun">, </span><span class="pln">secret</span><span class="pun">);
+</span><span class="kwd">const </span><span class="pln">sig3 </span><span class="pun">= </span><span class="typ">Sig</span><span class="pun">(</span><span class="pln">R</span><span class="pun">, </span><span class="typ">Sig<wbr/></span><span class="pun">.</span><span class="pln">fromBlob</span><span class="pun">(</span><span class="pln">sig1</span><span class="pun">)<wbr/>.</span><span class="pln">s </span><span class="pun">+ </span><span class="typ">Sig<wbr/></span><span class="pun">.</span><span class="pln">fromBlob</span><span class="pun">(</span><span class="pln">sig2</span><span class="pun">)<wbr/>.</span><span class="pln">s</span><span class="pun">)<wbr/>.</span><span class="pln">toBlob</span><span class="pun">();
+
+</span><span class="com">// No one can verify any of those individually
+</span><span class="kwd">assert</span><span class="pun">(!<a href="../../../agora/common/crypto/Schnorr/verify.html"></span><span class="pln">verify</span></a><span class="pun">(</span><span class="pln">kp1<wbr/></span><span class="pun">.</span><span class="pln">V</span><span class="pun">, </span><span class="pln">sig1</span><span class="pun">, </span><span class="pln">secret</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(!<a href="../../../agora/common/crypto/Schnorr/verify.html"></span><span class="pln">verify</span></a><span class="pun">(</span><span class="pln">kp1<wbr/></span><span class="pun">.</span><span class="pln">V</span><span class="pun">, </span><span class="pln">sig2</span><span class="pun">, </span><span class="pln">secret</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(!<a href="../../../agora/common/crypto/Schnorr/verify.html"></span><span class="pln">verify</span></a><span class="pun">(</span><span class="pln">kp2<wbr/></span><span class="pun">.</span><span class="pln">V</span><span class="pun">, </span><span class="pln">sig2</span><span class="pun">, </span><span class="pln">secret</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(!<a href="../../../agora/common/crypto/Schnorr/verify.html"></span><span class="pln">verify</span></a><span class="pun">(</span><span class="pln">kp2<wbr/></span><span class="pun">.</span><span class="pln">V</span><span class="pun">, </span><span class="pln">sig1</span><span class="pun">, </span><span class="pln">secret</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(!<a href="../../../agora/common/crypto/Schnorr/verify.html"></span><span class="pln">verify</span></a><span class="pun">(</span><span class="pln">kp1<wbr/></span><span class="pun">.</span><span class="pln">V</span><span class="pun">, </span><span class="pln">sig3</span><span class="pun">, </span><span class="pln">secret</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(!<a href="../../../agora/common/crypto/Schnorr/verify.html"></span><span class="pln">verify</span></a><span class="pun">(</span><span class="pln">kp2<wbr/></span><span class="pun">.</span><span class="pln">V</span><span class="pun">, </span><span class="pln">sig3</span><span class="pun">, </span><span class="pln">secret</span><span class="pun">));
+
+</span><span class="com">// But multisig works
+</span><span class="kwd">assert</span><span class="pun">(<a href="../../../agora/common/crypto/Schnorr/verify.html"></span><span class="pln">verify</span></a><span class="pun">(</span><span class="pln">X</span><span class="pun">, </span><span class="pln">sig3</span><span class="pun">, </span><span class="pln">secret</span><span class="pun">));
+</span></code></pre>
+</section>
+<section><h2>Example</h2>
+
+<pre class="code"><code class="lang-d"><span class="kwd">import <a href="../../../agora/common/Serializer.html"></span><span class="pln">agora<wbr/></span><span class="pun">.</span><span class="pln">common<wbr/></span><span class="pun">.</span><span class="typ">Serializer</span></a><span class="pun">;
+
+</span><span class="kwd">const </span><span class="pln">KP </span><span class="pun">= <a href="../../../agora/common/crypto/Schnorr/Pair.random.html"></span><span class="typ">Pair<wbr/></span><span class="pun">.</span><span class="pln">random</span></a><span class="pun">();
+</span><span class="kwd">auto </span><span class="pln">signature </span><span class="pun">= </span><span class="typ">Sig</span><span class="pun">(</span><span class="pln">KP<wbr/></span><span class="pun">.</span><span class="pln">V</span><span class="pun">, </span><span class="pln">KP<wbr/></span><span class="pun">.</span><span class="pln">v</span><span class="pun">)<wbr/>.</span><span class="pln">toBlob</span><span class="pun">();
+</span><span class="kwd">auto </span><span class="pln">bytes </span><span class="pun">= </span><span class="pln">signature<wbr/></span><span class="pun">.</span><span class="pln">serializeFull</span><span class="pun">();
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">bytes<wbr/></span><span class="pun">.</span><span class="pln">deserializeFull</span><span class="pun">!</span><span class="typ">Signature </span><span class="pun">== </span><span class="pln">signature</span><span class="pun">);
+</span></code></pre>
+</section>
+</section>
+			<section>
+				<h2>Functions</h2>
+				<table>
+					<col class="caption"/>
+					<tr>
+						<th>Name</th><th>Description</th>
+					</tr>
+					<tr>
+						<td>
+							<code>
+								<a id="sign" class="public" href="../../../agora/common/crypto/Schnorr/sign.html">sign</a><span class="tableEntryAnnotation">(kp, data)</span>
+							</code>
+						</td>
+						<td>Single-signer trivial API
+</td>
+					</tr>
+					<tr>
+						<td>
+							<code>
+								<a id="sign" class="public" href="../../../agora/common/crypto/Schnorr/sign.html">sign</a><span class="tableEntryAnnotation">(privateKey, data)</span>
+							</code>
+						</td>
+						<td>Single-signer privkey API
+</td>
+					</tr>
+					<tr>
+						<td>
+							<code>
+								<a id="sign" class="public" href="../../../agora/common/crypto/Schnorr/sign.html">sign</a><span class="tableEntryAnnotation">(kp, r, data)</span>
+							</code>
+						</td>
+						<td>Sign with a given <code class="lang-d"><a href="../../../agora/common/crypto/Schnorr/sign.html#r"><span class="pln">r</span></a></code> (warning: <code class="lang-d"><a href="../../../agora/common/crypto/Schnorr/sign.html#r"><span class="pln">r</span></a></code> should never be reused with <code class="lang-d"><span class="pln">x</span></code>)
+</td>
+					</tr>
+					<tr>
+						<td>
+							<code>
+								<a id="sign" class="public" href="../../../agora/common/crypto/Schnorr/sign.html">sign</a><span class="tableEntryAnnotation">(x, X, R, r, data)</span>
+							</code>
+						</td>
+						<td>Complex API, allow multisig
+</td>
+					</tr>
+					<tr>
+						<td>
+							<code>
+								<a id="verify" class="public" href="../../../agora/common/crypto/Schnorr/verify.html">verify</a><span class="tableEntryAnnotation">(X, sig, data)</span>
+							</code>
+						</td>
+						<td>Verify that a signature matches the provided data
+</td>
+					</tr>
+				</table>
+			</section>
+			<section>
+				<h2>Structs</h2>
+				<table>
+					<col class="caption"/>
+					<tr>
+						<th>Name</th><th>Description</th>
+					</tr>
+					<tr>
+						<td>
+							<code>
+								<a id="Pair" class="public" href="../../../agora/common/crypto/Schnorr/Pair.html">Pair</a>
+							</code>
+						</td>
+						<td>Contains a scalar and its projection on the elliptic curve (<code class="lang-d"><a href="../../../agora/common/crypto/Schnorr/Pair.v.html"><span class="pln">v</span></a></code> and <code class="lang-d"><span class="pln">v<wbr/></span><span class="pun">.</span><span class="pln">G</span></code>)
+</td>
+					</tr>
+				</table>
+			</section>
+			<footer>
+				<table class="license-info">
+					<tr>
+						<th>Authors</th>
+						<td>
+							
+						</td>
+					</tr>
+					<tr>
+						<th>Copyright</th>
+						<td>
+							<p>Copyright (c) 2019 BOS Platform Foundation Korea
+        All rights reserved.
+</p>
+
+						</td>
+					</tr>
+					<tr>
+						<th>License</th>
+						<td>
+							<p>MIT License. See LICENSE for details.
+</p>
+
+						</td>
+					</tr>
+				</table>
+				<p class="faint">Generated using the DDOX documentation generator</p>
+			</footer>
+		</div>
+	</body>
+</html>
